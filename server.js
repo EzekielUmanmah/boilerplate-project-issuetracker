@@ -16,7 +16,12 @@ app.use('/public', express.static(process.cwd() + '/public'));
 
 app.use(cors({origin: '*'})); //For FCC testing purposes only
 
-
+//connect to MongoDB 
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGOLAB_URI, {
+  useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false
+}).then(() => console.log('Connected to MongoDB.'))
+  .catch((e) => console.error('Something went wrong...', e));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,12 +29,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //Sample front-end
 app.route('/:project/')
   .get(function (req, res) {
+    //console.log('/:project/',req.body)
     res.sendFile(process.cwd() + '/views/issue.html');
   });
 
 //Index page (static HTML)
 app.route('/')
   .get(function (req, res) {
+    //console.log('/',req.body)
     res.sendFile(process.cwd() + '/views/index.html');
   });
 

@@ -16,7 +16,7 @@
       <div id='submitNewIssue'>
         <br>
         <h3>Submit a new issue:</h3>
-        <form id="newIssue" method="post" action="/api/">
+        <form id="newIssue" method="post" action="/api">
           <input type="text" name="issue_title" placeholder="*Title" style="width: 320px; margin-bottom: 3px;" required=''><br>
           <textarea type="text" name="issue_text" placeholder="*Text" style="width: 320px; height: 100px;" required=''></textarea><br>
           <input type="text" name="created_by" placeholder="*Created by" style="width: 100px" required=''>
@@ -36,17 +36,18 @@
             crossorigin="anonymous"></script>
     <script>
       $(function() {
-        let currentProject = window.location.pathname.replace(/\//g, "");;
-        let url = "/api/issues/"+currentProject;
+        let currentProject = window.location.pathname.replace(/\//g, "");
+        let url = "/api/issues/"+currentProject; //alert(1)
         $('#projectTitle').text('All issues for: '+currentProject)
+        
         $.ajax({
           type: "GET",
           url: url,
           success: function(data)
-          {
+          { //alert(2);alert(JSON.stringify(data))
             let issues= [];
             data.forEach(function(ele) {
-              console.log(ele);
+              console.log(ele);//alert(JSON.stringify(ele))
               let openstatus;
               (ele.open) ? openstatus = 'open' : openstatus = 'closed';
               let single = [
@@ -70,13 +71,16 @@
         });
         
         $('#newIssue').submit(function(e){
-          e.preventDefault();
-          $(this).attr('action', "/api/issues/" + currentProject);
+          e.preventDefault(); //alert('post1');
+          //$(this).attr('action', "/api/issues/" + currentProject);
           $.ajax({
             type: "POST",
             url: url,
             data: $(this).serialize(),
-            success: function(data) { window.location.reload(true); }
+            success: function(data) { 
+                //alert('post2');alert(JSON.stringify(data))
+                window.location.reload(true); 
+              }
           });
         });
         
