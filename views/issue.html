@@ -24,10 +24,21 @@
           <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
           <button type="submit">Submit Issue</button>
         </form>
+        <br>
+        <form id="testForm2" class="border">
+        <input type="text" name="_id" placeholder="*_id" style="width: 100px" required=''><br>
+        <input type="text" name="issue_title" placeholder="(opt)Title" style="width: 100px"><br>
+        <textarea type="text" name="issue_text" placeholder="(opt)Text" style="width: 100px"></textarea><br>
+        <input type="text" name="created_by" placeholder="(opt)Created by" style="width: 100px"><br>
+        <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px"><br>
+        <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
+        <label><input type="checkbox" name="open" value="false"> Check to close issue</label><br>
+        <button type="submit">Submit Issue</button>
+      </form>
       </div>
       
+      <code id='jsonResult'></code>
       <div id='issueDisplay'></div>
-      
       <hr style='margin: 50px; margin-top: 200px'>
     </center>
     
@@ -69,7 +80,7 @@
             $('#issueDisplay').html(issues.join(''));
           }
         });
-        
+
         $('#newIssue').submit(function(e){
           e.preventDefault(); //alert('post1');
           //$(this).attr('action', "/api/issues/" + currentProject);
@@ -83,6 +94,23 @@
               }
           });
         });
+
+        $('#testForm2').submit(function(e) {
+          e.preventDefault(); 
+          $.ajax({
+            url: url,
+            type: 'put',
+            data: $('#testForm2').serialize(),
+            success: function(data) { //alert(JSON.stringify(data))
+              //let str = `{"result": }`
+              $('#jsonResult').text(JSON.stringify(data));
+              //serve the correct response {"result":"successfully updated","_id":}
+              //$('#jsonResult').html({"result":"successfully updated",data._id});
+              //window.location.reload(true);
+            }
+          });
+          //e.preventDefault();
+        });
         
         $('#issueDisplay').on('click','.closeIssue', function(e) {
           let url = "/api/issues/"+currentProject;
@@ -90,10 +118,11 @@
             type: "PUT",
             url: url,
             data: {_id: $(this).attr('id'), open: false},
-            success: function(data) { alert(data); window.location.reload(true); }
+            success: function(data) { alert(JSON.stringify(data)); window.location.reload(true); }
           });
           e.preventDefault();
         });
+        
         $('#issueDisplay').on('click','.deleteIssue', function(e) {
           let url = "/api/issues/"+currentProject;
           $.ajax({

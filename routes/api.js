@@ -11,17 +11,20 @@ module.exports = function (app) {
     //the GET request should query the db after a successful POST request and serve the DATA
     //the DATA should be an ARRAY of OBJECTS of all issues for a profile
     //an OBJECT should be a single issue
-    .get(function (req, res){
+    .get(function (req, res, next){
 
       let project = req.params.project;
       
-      const { issue_title, issue_text, created_by, assigned_to, status_text, open, created_on, updated_on } = req.query;
+      const { issue_title, issue_text, created_by, assigned_to, status_text, open, created_on, updated_on, _id } = req.query;
 
       //working on filtering issues by property; note the return should retun either the filtered result or full result
-console.log(req.query)
+//console.log('get',req.query, req.params, req.body)
       parentSchema.findOne({project})
       .exec()
       .then(result => { 
+        //if(_id){
+          //return res.redirect('put')
+        //}
         if(issue_title) {
           result.issue = result.issue.filter(x => x.issue_title == issue_title)
         }
@@ -46,8 +49,13 @@ console.log(req.query)
         if(updated_on){
           result.issue = result.issue.filter(x => x.updated_on == updated_on)
         }
-        //else res.send('No issues')
-        res.send(result.issue)
+
+        if(result){
+          res.json(result.issue)
+        } else{
+          res.send('no issues')
+        }
+
       })
       .catch(err => console.log(err))
 
@@ -96,6 +104,43 @@ console.log(req.query)
     
     .put(function (req, res){
       let project = req.params.project;
+
+      const { _id, issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
+
+console.log('req.params', req.params, req.body)
+
+      parentSchema.findOne({project})
+      .exec()
+      .then(async result => {
+
+        result.issue.filter(x => {
+          if(x._id == _id){
+            if(issue_title){
+              x.issue_title = issue_title;
+            }
+            if(issue_text){
+              x.issue_text = issue_text;
+            }
+            if(created_by){
+              x.created_by = created_by;
+            }
+            if(assigned_to){
+              x.assigned_to = assigned_to;
+            }
+            if(status_text){
+              x.status_text = status_text;
+            }
+            x.updated_on = new Date().toISOString()
+            res.json({
+              result:"successfully updated",
+              "_id": x._id
+            })
+          } 
+        })
+        
+        await result.save();
+      })
+      .catch(err => console.log(err))
       
       console.log(3, project)
     })
