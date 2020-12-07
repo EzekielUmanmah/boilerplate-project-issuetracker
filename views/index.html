@@ -76,6 +76,7 @@
             crossorigin="anonymous"></script>
     <script>
       $(function() {
+
         $('#testForm').submit(function(e) {
           $.ajax({
             url: '/api/issues/apitest',
@@ -87,17 +88,19 @@
           });
           e.preventDefault();
         });
+
         $('#testForm2').submit(function(e) {
           $.ajax({
-            url: '/api/issues/apitest',
+            url: '/api/issues/:project',
             type: 'put',
             data: $('#testForm2').serialize(),
-            success: function(data) {
+            success: function(data) { 
               $('#jsonResult').text(JSON.stringify(data));
             }
           });
           e.preventDefault();
         });
+
         $('#testForm3').submit(function(e) {
           $.ajax({
             url: '/api/issues/apitest',
