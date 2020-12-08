@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const parentSchema = require('../schemas/parentSchema');
 const issueFile = require('../schemas/issueSchema');
-const issueSchema = new mongoose.model('issueSchema', issueFile);
+const issueSchema = mongoose.model('issueSchema', issueFile);
 
 module.exports = function (app) {
 
@@ -15,10 +15,10 @@ module.exports = function (app) {
 
       let project = req.params.project;
       
-      const { issue_title, issue_text, created_by, assigned_to, status_text, open, created_on, updated_on } = req.query;
+      const { issue_title, issue_text, created_by, assigned_to, status_text, open, created_on, updated_on, _id } = req.query;
 
       //working on filtering issues by property; note the return should retun either the filtered result or full result
-console.log(req.query)
+
       parentSchema.findOne({project})
       .exec()
       .then(result => { 
@@ -45,6 +45,9 @@ console.log(req.query)
         }
         if(updated_on){
           result.issue = result.issue.filter(x => x.updated_on == updated_on)
+        }
+        if(_id){
+          result.issue = result.issue.filter(x => x._id == _id)
         }
         //else res.send('No issues')
         res.send(result.issue)
@@ -99,45 +102,50 @@ console.log(req.query)
 
       const { _id, issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
 
-//console.log('req.params', req.params,project, req.body)
+      if(!_id) res.send({ error: 'missing _id' });
 
-      //parentSchema.findOne({project})
+      /*let updateObj = {};
+      Object.keys(req.body).forEach(x => {
+        if(req.body[x] != ''){
+          updateObj[x] = req.body[x]
+        }
+      })
+console.log(updateObj)*/
+
       parentSchema.find()
       .exec()
-      .then(result => {
+      .then(allProjects => {
 
-        result.filter(x => {
-          //x contains all projects and its associated issues
-          return x.issue.map(y => {
-            //map through all issues until an issue._id matches the PUT id
-            if(y._id == _id){
-              
-              if(issue_title){
-                y.issue_title = issue_title;
-              }
-              if(issue_text){
-                y.issue_text = issue_text;
-              }
-              if(created_by){
-                y.created_by = created_by;
-              }
-              if(assigned_to){
-                y.assigned_to = assigned_to;
-              }
-              if(status_text){
-                y.status_text = status_text;
-              }
-              y.updated_on = new Date().toISOString();
-              x.save();
-              res.json({ result: 'successfully updated', '_id': _id })
-            }
+        allProjects.map(project => {
+          project.issue.map(issueObj => {
+              if(issueObj._id == _id){
+                if(issue_title != ''){
+                  issueObj.issue_title = issue_title;
+                }
+                if(issue_text != ''){
+                  issueObj.issue_text = issue_text;
+                }
+                if(created_by != ''){
+                  issueObj.created_by = created_by;
+                }
+                if(assigned_to != ''){
+                  issueObj.assigned_to = assigned_to;
+                }
+                if(status_text != ''){
+                  issueObj.status_text = status_text;
+                }
 
+                issueObj.updated_on = new Date().toISOString();
+                project.save();
+                res.json({ 
+                  result: 'successfully updated',
+                  '_id': issueObj._id 
+                })
+              }
           });
-        })
-        
+        }); 
       })
       .catch(err => console.log(err))
-      
     })
     
     .delete(function (req, res){
