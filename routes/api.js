@@ -104,21 +104,25 @@ module.exports = function (app) {
 
       if(!_id) res.send({ error: 'missing _id' });
 
-      /*let updateObj = {};
+      let updateObj = {};
       Object.keys(req.body).forEach(x => {
         if(req.body[x] != ''){
           updateObj[x] = req.body[x]
         }
       })
-console.log(updateObj)*/
+
+      if(Object.keys(updateObj).length < 2) return res.json({ error: 'no update field(s) sent', '_id': _id });
 
       parentSchema.find()
       .exec()
       .then(allProjects => {
+        let test;
+        allProjects.filter(project => {
 
-        allProjects.map(project => {
-          project.issue.map(issueObj => {
+          project.issue.filter(issueObj => {
+            
               if(issueObj._id == _id){
+                test = issueObj;
                 if(issue_title != ''){
                   issueObj.issue_title = issue_title;
                 }
@@ -143,7 +147,9 @@ console.log(updateObj)*/
                 })
               }
           });
+
         }); 
+        if(!test) return res.json({ error: 'could not update', '_id': _id })
       })
       .catch(err => console.log(err))
     })
