@@ -2,25 +2,29 @@ const mongoose = require('mongoose');
 
 
 const issueSchema = new mongoose.Schema({
+  project: {
+    type: String,
+    required: true
+  },
   issue_title: {
     type: String, 
-    //required: true
+    required: true
     },
   issue_text: {
     type: String, 
-    //required: true
+    required: true
     },
   created_by: {
     type: String, 
-    //required: true
+    required: true
     },
   assigned_to: String,
   status_text: String,
   open: Boolean,
-  //created_on: {type: Date, default: Date.now()},
-  //updated_on: {type: Date, default: Date.now()}
-  created_on: Date,
-  updated_on: Date
+  created_on: {type: Date, default: Date.now()},
+  updated_on: {type: Date, default: Date.now()}
+  //created_on: Date,
+  //updated_on: Date
 });
 
-module.exports = issueSchema;
+module.exports = mongoose.model('issueSchema', issueSchema);
