@@ -157,7 +157,14 @@ module.exports = function (app) {
     .delete(function (req, res){
       let project = req.params.project;
       
-      console.log(4, project)
+      const { _id } = req.body;
+
+      parentSchema.findOne()
+      .exec()
+      .then(result => {
+          result.children.id(_id).remove();
+      })
+
     });
     
 };

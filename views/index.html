@@ -103,7 +103,7 @@
 
         $('#testForm3').submit(function(e) {
           $.ajax({
-            url: '/api/issues/apitest',
+            url: '/api/issues/:project',
             type: 'delete',
             data: $('#testForm3').serialize(),
             success: function(data) {
