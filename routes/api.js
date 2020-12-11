@@ -42,7 +42,7 @@ module.exports = function (app) {
         if(_id){
           result = result.filter(x => x._id == _id)
         }
-        res.send(result);
+        return res.send(result);
       })
       .catch(err => console.log(err));
 
@@ -55,7 +55,7 @@ module.exports = function (app) {
 
       const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
 
-      if(!issue_title || !issue_text || !created_by) return res.json({ error: 'required field(s) missing' });
+      if(!issue_title || !issue_text || !created_by) return res.send({ error: 'required field(s) missing' });
 
       const newIssue = new issueSchema({
         project,
@@ -70,8 +70,8 @@ module.exports = function (app) {
       });
 
       newIssue.save( (err, result) => {
-        if(err) console.log(err)
-        else if(result) res.json(result)
+        if(err) console.log(err); 
+        if(result) return res.json(result)
       });
       
     })
